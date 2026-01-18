@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutik Control</title>
+<style>
+:root{
+--bg0:#070A12;--bg1:#0B1020;
+--card:rgba(255,255,255,.06);
+--stroke:rgba(255,255,255,.12);
+--text:#E9EEFF;--muted:rgba(233,238,255,.65);
+
+--green:#35F2A6;--yellow:#FFD166;--red:#FF4D6D;--cyan:#00D4FF;
+
+--shadow:0 20px 60px rgba(0,0,0,.45);
+--radius:18px;
+
+--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+--sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+*{box-sizing:border-box;}
+body{
+margin:0;
+font-family:var(--sans);
+color:var(--text);
+background:
+radial-gradient(1200px 800px at 10% 10%,rgba(124,92,255,.16),transparent 55%),
+radial-gradient(900px 700px at 95% 15%,rgba(0,212,255,.10),transparent 55%),
+radial-gradient(900px 700px at 50% 110%,rgba(53,242,166,.06),transparent 55%),
+linear-gradient(180deg,var(--bg0),var(--bg1));
+min-height:100vh;
+padding:28px;
+}
+
+.wrap{max-width:1100px;margin:0 auto;display:grid;gap:14px;}
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;padding:2px 2px 0 2px;}
+.brand{display:flex;gap:12px;align-items:flex-end;}
+h1{font-size:18px;margin:0;letter-spacing:.3px;}
+.sub{margin:2px 0 0;color:var(--muted);font-size:13px;}
+
+.pill{
+font-size:12px;color:var(--muted);
+border:1px solid rgba(255,255,255,.12);
+background:rgba(255,255,255,.04);
+padding:6px 10px;border-radius:999px;
+display:flex;gap:8px;align-items:center;
+user-select:none;white-space:nowrap;
+}
+.dot{width:8px;height:8px;border-radius:999px;background:var(--green);box-shadow:0 0 0 3px rgba(53,242,166,.10);}
+.divider{height:1px;background:rgba(255,255,255,.10);border-radius:999px;}
+
+.grid{display:grid;grid-template-columns:380px 1fr;gap:18px;}
+@media (max-width:920px){.grid{grid-template-columns:1fr;}}
+
+.card{
+background:linear-gradient(180deg,var(--card),rgba(255,255,255,.04));
+border:1px solid var(--stroke);
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+backdrop-filter:blur(10px);
+-webkit-backdrop-filter:blur(10px);
+overflow:visible;
+position:relative;
+}
+.card .hd{
+padding:16px 16px 12px;
+border-bottom:1px solid rgba(255,255,255,.08);
+display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.card .hd .title{font-weight:650;font-size:14px;letter-spacing:.25px;}
+.body{padding:16px;display:grid;gap:14px;}
+
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px;}
+
+input{
+width:100%;
+padding:12px 12px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+background:rgba(7,10,18,.55);
+color:var(--text);
+outline:none;
+}
+input:focus{box-shadow:none;}
+
+.row{display:flex;gap:10px;align-items:center;}
+.row>*{flex:1;}
+
+button{
+border:none;
+cursor:pointer;
+padding:12px 14px;
+border-radius:14px;
+font-weight:650;
+letter-spacing:.2px;
+color:rgba(233,238,255,.90);
+transition:transform .08s ease,filter .15s ease,opacity .15s ease;
+user-select:none;
+box-shadow:none !important;
+background:rgba(7,10,18,.35);
+border:1px solid rgba(255,255,255,.12);
+}
+button:active{transform:translateY(1px);}
+button:hover{filter:brightness(1.05);}
+
+.btn-send{flex:0 0 auto;width:120px;}
+
+.note{
+font-size:12px;
+color:rgba(233,238,255,.55);
+margin-top:2px;
+font-family:var(--mono);
+min-height:16px;
+}
+
+.kbd{
+font-family:var(--mono);
+font-size:11px;
+border:1px solid rgba(255,255,255,.16);
+background:rgba(255,255,255,.06);
+padding:2px 6px;
+border-radius:8px;
+color:rgba(233,238,255,.85);
+}
+
+
+.dd{position:relative;user-select:none;}
+.ddBtn{
+width:100%;
+padding:12px 12px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.12);
+background:rgba(7,10,18,.55);
+color:var(--text);
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+cursor:pointer;
+outline:none;
+}
+.ddBtn:focus{box-shadow:none;border-color:rgba(255,255,255,.12);}
+.caret{
+width:10px;height:10px;flex:0 0 auto;
+border-right:2px solid rgba(233,238,255,.65);
+border-bottom:2px solid rgba(233,238,255,.65);
+transform:rotate(45deg);
+margin-right:2px;
+transition:transform .12s ease;
+opacity:.9;
+}
+.dd.open .caret{transform:rotate(225deg);}
+.ddMenu{
+position:absolute;
+top:calc(100% + 8px);
+left:0;right:0;
+z-index:9999;
+border-radius:16px;
+border:1px solid rgba(255,255,255,.12);
+background:rgba(10,14,26,.96);
+backdrop-filter:blur(10px);
+-webkit-backdrop-filter:blur(10px);
+box-shadow:0 20px 60px rgba(0,0,0,.55);
+overflow:hidden;
+display:none;
+max-height:320px;
+}
+.dd.open .ddMenu{display:block;}
+.ddSearch{
+padding:10px;
+border-bottom:1px solid rgba(255,255,255,.08);
+background:rgba(255,255,255,.03);
+}
+.ddSearch input{padding:10px 10px;border-radius:12px;}
+.ddList{max-height:270px;overflow:auto;}
+.ddItem{
+padding:10px 12px;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+font-size:13px;
+color:rgba(233,238,255,.90);
+border-top:1px solid rgba(255,255,255,.04);
+}
+.ddItem:first-child{border-top:none;}
+.ddItem:hover{background:rgba(255,255,255,.06);}
+.ddItem .tag{font-size:11px;color:rgba(233,238,255,.55);font-family:var(--mono);}
+.ddEmpty{padding:12px;color:rgba(233,238,255,.55);font-size:13px;}
+
+
+.quikGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.hint{font-size:12px;color:rgba(233,238,255,.55);line-height:1.35;margin-top:10px;}
+.q-green{border-color:rgba(53,242,166,.45)!important;}
+.q-red{border-color:rgba(255,77,109,.45)!important;}
+.q-yellow{border-color:rgba(255,209,102,.50)!important;}
+
+
+.statusWrap{display:grid;gap:10px;}
+.statusList{display:grid;gap:8px;max-height:50vh;overflow:auto;padding-right:4px;}
+.statusRow{
+display:flex;align-items:center;justify-content:space-between;gap:10px;
+padding:10px 12px;border-radius:14px;
+border:1px solid rgba(255,255,255,.10);
+background:rgba(7,10,18,.35);
+}
+.statusName{
+font-family:var(--mono);
+font-size:12px;
+color:rgba(233,238,255,.92);
+overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.badge{
+font-size:11px;font-weight:650;letter-spacing:.2px;
+padding:6px 10px;border-radius:999px;
+border:1px solid rgba(255,255,255,.12);
+background:rgba(255,255,255,.06);
+color:rgba(233,238,255,.92);
+}
+.badge.alert{border-color:rgba(255,77,109,.30);background:rgba(255,77,109,.08);}
+.badge.storing{border-color:rgba(0,212,255,.28);background:rgba(0,212,255,.08);}
+.badge.selling{border-color:rgba(255,209,102,.30);background:rgba(255,209,102,.08);}
+.badge.fishing{border-color:rgba(53,242,166,.28);background:rgba(53,242,166,.08);}
+.badge.stopped{border-color:rgba(233,238,255,.16);background:rgba(255,255,255,.05);color:rgba(233,238,255,.75);}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div>
+        <h1>Rutik</h1>
+        <div class="sub">Control Panel</div>
+      </div>
+    </div>
+    <div class="pill">
+      <span class="dot"></span>
+      <span>Connected</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="hd">
+        <div class="title">Controls</div>
+        <div class="sub">Target: <span class="kbd" id="targetLabel">ALL</span></div>
+      </div>
+
+      <div class="body">
+
+        <div>
+          <label>Select bot</label>
+          <div class="dd" id="dd">
+            <div class="ddBtn" id="ddBtn" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+              <span id="ddValue">ALL</span>
+              <span class="caret" aria-hidden="true"></span>
+            </div>
+            <div class="ddMenu" id="ddMenu" role="listbox">
+              <div class="ddSearch">
+                <input id="ddSearch" placeholder="Search bots..." autocomplete="off">
+              </div>
+              <div class="ddList" id="ddList"></div>
+            </div>
+          </div>
+          <div class="note" id="netNote"></div>
+        </div>
+
+        <div>
+          <label for="cmd">Send a Command</label>
+          <div class="row">
+            <input id="cmd" placeholder=".rutik start" autocomplete="off">
+            <button class="btn-send" id="btnSend" type="button">Send</button>
+          </div>
+        </div>
+
+        <div>
+          <label>Global</label>
+          <div class="quikGrid">
+            <button id="btnDisconnectAll" type="button">Disconnect All</button>
+            <button id="btnAlarmOnPlayer" type="button">Alarm OnPlayer</button>
+            <button id="btnLeaveOnPlayer" type="button">Leave OnPlayer</button>
+            <button id="btnLeaveOnKick" type="button">Leave OnKick</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hd">
+        <div class="title">Bots Status</div>
+     </div>
+      <div class="body statusWrap">
+        <div class="statusList" id="statusList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var netNote=document.getElementById("netNote");
+var cmdEl=document.getElementById("cmd");
+
+var targetLabel=document.getElementById("targetLabel");
+var statusList=document.getElementById("statusList");
+
+var btnDisconnectAll=document.getElementById("btnDisconnectAll");
+var btnAlarmOnPlayer=document.getElementById("btnAlarmOnPlayer");
+var btnLeaveOnPlayer=document.getElementById("btnLeaveOnPlayer");
+var btnLeaveOnKick=document.getElementById("btnLeaveOnKick");
+
+
+var dd=document.getElementById("dd");
+var ddBtn=document.getElementById("ddBtn");
+var ddValue=document.getElementById("ddValue");
+var ddList=document.getElementById("ddList");
+var ddSearch=document.getElementById("ddSearch");
+
+var allBots=[];
+var selectedTarget="ALL";
+var lastStatesSig="";
+
+async function getJson(url){
+  var res=await fetch(url,{cache:"no-store"});
+  if(!res.ok) throw new Error(url+" -> "+res.status);
+  return await res.json();
+}
+
+async function postCmdOne(target,cmdText){
+  var res=await fetch("/cmd?target="+encodeURIComponent(target),{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=UTF-8"},
+    body:cmdText
+  });
+  if(!res.ok) throw new Error("/cmd?target="+target+" -> "+res.status);
+  return true;
+}
+
+async function postAll(cmdText){
+  if(!Array.isArray(allBots) || allBots.length===0) throw new Error("No bots from /bots");
+  for(var i=0;i<allBots.length;i++){
+    await postCmdOne(allBots[i],cmdText);
+  }
+}
+
+async function postSelected(cmdText){
+  if(selectedTarget==="ALL"){
+    await postAll(cmdText);
+    return;
+  }
+  await postCmdOne(selectedTarget,cmdText);
+}
+
+
+function openDropdown(){
+  dd.classList.add("open");
+  ddBtn.setAttribute("aria-expanded","true");
+  ddSearch.value="";
+  renderDropdownList("");
+  setTimeout(function(){ddSearch.focus();},0);
+}
+function closeDropdown(){
+  dd.classList.remove("open");
+  ddBtn.setAttribute("aria-expanded","false");
+}
+function toggleDropdown(){
+  if(dd.classList.contains("open")) closeDropdown(); else openDropdown();
+}
+ddBtn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();toggleDropdown();});
+ddBtn.addEventListener("keydown",function(e){
+  if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleDropdown();}
+  if(e.key==="Escape"){closeDropdown();}
+});
+ddSearch.addEventListener("click",function(e){e.stopPropagation();});
+ddSearch.addEventListener("input",function(){renderDropdownList(ddSearch.value||"");});
+document.addEventListener("click",function(e){if(!dd.contains(e.target))closeDropdown();});
+
+function setTarget(t){
+  selectedTarget=t||"ALL";
+  ddValue.textContent=selectedTarget;
+  targetLabel.textContent=selectedTarget;
+}
+
+function renderDropdownList(filterText){
+  var f=(filterText||"").toLowerCase().trim();
+  var items=["ALL"].concat(allBots||[]);
+  ddList.innerHTML="";
+  var shown=0;
+
+  for(var i=0;i<items.length;i++){
+    var name=items[i];
+    if(f && name.toLowerCase().indexOf(f)===-1) continue;
+    shown++;
+
+    var div=document.createElement("div");
+    div.className="ddItem";
+    div.setAttribute("role","option");
+
+    var left=document.createElement("span");
+    left.textContent=name;
+    div.appendChild(left);
+
+    if(name===selectedTarget){
+      var tag=document.createElement("span");
+      tag.className="tag";
+      tag.textContent="selected";
+      div.appendChild(tag);
+    }
+
+    (function(n){
+      div.addEventListener("click",function(e){
+        e.preventDefault();e.stopPropagation();
+        setTarget(n);
+        closeDropdown();
+      });
+    })(name);
+
+    ddList.appendChild(div);
+  }
+
+  if(shown===0){
+    var empty=document.createElement("div");
+    empty.className="ddEmpty";
+    empty.textContent="No bots found";
+    ddList.appendChild(empty);
+  }
+}
+
+
+document.getElementById("btnSend").addEventListener("click",async function(){
+  try{
+    var c=(cmdEl.value||"").trim();
+    if(!c) return;
+    await postSelected(c);
+    cmdEl.value="";
+    cmdEl.focus();
+    netNote.textContent="";
+  }catch(err){
+    netNote.textContent=String(err.message||err);
+  }
+});
+cmdEl.addEventListener("keydown",function(e){
+  if(e.key==="Enter"){
+    e.preventDefault();
+    document.getElementById("btnSend").click();
+  }
+});
+
+
+btnDisconnectAll.addEventListener("click",async function(){
+  try{ await postAll(".disconnect"); netNote.textContent=""; }
+  catch(err){ netNote.textContent=String(err.message||err); }
+});
+
+/* STATUS PRIORITY:
+   1.Alert
+   2.Storing
+   3.Selling
+   4.Fishing (Enabled)
+   5.Stopped
+*/
+function statusFromState(st){
+  st = st || {};
+  if(st.Alert) return {text:"Alert", cls:"alert", pr:1};
+  if(st.Storing) return {text:"Storing", cls:"storing", pr:2};
+  if(st.Selling) return {text:"Selling", cls:"selling", pr:3};
+  if(st.Enabled) return {text:"Fishing", cls:"fishing", pr:4};
+  return {text:"Stopped", cls:"stopped", pr:5};
+}
+
+/* Quik tri-state:
+   - all true  -> green, click sends false
+   - all false -> red,   click sends true
+   - mixed     -> yellow, click sends true (as you requested)
+*/
+function computeTriState(states, key){
+  var t=0,f=0;
+  for(var i=0;i<allBots.length;i++){
+    var name=allBots[i];
+    var st=(states && states[name]) ? states[name] : {};
+    if(!!st[key]) t++; else f++;
+  }
+  if(t>0 && f>0) return {mode:"mixed", next:true};
+  if(t>0) return {mode:"allTrue", next:false};
+  return {mode:"allFalse", next:true};
+}
+
+function applyQuikVisual(btn, tri){
+  btn.classList.remove("q-green","q-red","q-yellow");
+  if(tri.mode==="mixed") btn.classList.add("q-yellow");
+  else if(tri.mode==="allTrue") btn.classList.add("q-green");
+  else btn.classList.add("q-red");
+}
+
+function bindQuik(btn, tri, baseCmd){
+  btn.onclick = async function(){
+    try{
+      await postAll(baseCmd + " " + (tri.next ? "true" : "false"));
+      netNote.textContent="";
+    }catch(err){
+      netNote.textContent=String(err.message||err);
+    }
+  };
+}
+
+function renderStatusList(states){
+  statusList.innerHTML="";
+  if(!Array.isArray(allBots) || allBots.length===0){
+    var empty=document.createElement("div");
+    empty.className="statusRow";
+    empty.textContent="No bots";
+    statusList.appendChild(empty);
+    return;
+  }
+
+  var bots=allBots.slice(0);
+  bots.sort(function(a,b){
+    var sa=statusFromState(states ? states[a] : null);
+    var sb=statusFromState(states ? states[b] : null);
+    if(sa.pr!==sb.pr) return sa.pr-sb.pr;
+    return a.localeCompare(b);
+  });
+
+  for(var i=0;i<bots.length;i++){
+    var name=bots[i];
+    var s=statusFromState(states ? states[name] : null);
+
+    var row=document.createElement("div");
+    row.className="statusRow";
+
+    var left=document.createElement("div");
+    left.className="statusName";
+    left.textContent=name;
+
+    var badge=document.createElement("div");
+    badge.className="badge "+s.cls;
+    badge.textContent=s.text;
+
+    row.appendChild(left);
+    row.appendChild(badge);
+    statusList.appendChild(row);
+  }
+}
+
+async function loadBots(){
+  try{
+    var b=await getJson("/bots");
+    if(Array.isArray(b)){
+      allBots=b.slice(0);
+      if(selectedTarget!=="ALL" && allBots.indexOf(selectedTarget)===-1) setTarget("ALL");
+      renderDropdownList(ddSearch.value||"");
+    }
+  }catch(err){
+    
+  }
+}
+
+async function loadStates(){
+  try{
+    var states=await getJson("/states");
+    if(!states || typeof states!=="object") return;
+
+    
+    var keys=Object.keys(states).sort();
+    var sigParts=[];
+    for(var i=0;i<keys.length;i++){
+      var k=keys[i];
+      var v=states[k]||{};
+      sigParts.push(
+        k+":"+
+        (v.Alert?1:0)+
+        (v.Storing?1:0)+
+        (v.Selling?1:0)+
+        (v.Enabled?1:0)+
+        (v.detectPlayer?1:0)+
+        (v.leaveOnDetect?1:0)+
+        (v.leaveOnKick?1:0)
+      );
+    }
+    var sig=sigParts.join("|");
+
+    if(sig!==lastStatesSig){
+      renderStatusList(states);
+
+      var triDetect=computeTriState(states,"detectPlayer");
+      var triLeaveDetect=computeTriState(states,"leaveOnDetect");
+      var triLeaveKick=computeTriState(states,"leaveOnKick");
+
+      applyQuikVisual(btnAlarmOnPlayer, triDetect);
+      applyQuikVisual(btnLeaveOnPlayer, triLeaveDetect);
+      applyQuikVisual(btnLeaveOnKick, triLeaveKick);
+
+      bindQuik(btnAlarmOnPlayer, triDetect, ".rutik detectPlayer");
+      bindQuik(btnLeaveOnPlayer, triLeaveDetect, ".rutik leave true".startsWith(".rutik leave") ? ".rutik leave" : ".rutik leave");
+      bindQuik(btnLeaveOnKick, triLeaveKick, ".rutik leaveonkick");
+
+      lastStatesSig=sig;
+    }
+
+    netNote.textContent="";
+  }catch(err){
+    
+  }
+}
+
+
+(function fixLeaveCommandBinding(){
+  
+})();
+
+
+function rebindQuikCommandsAfterLoad(states){
+  var triLeaveDetect=computeTriState(states,"leaveOnDetect");
+  applyQuikVisual(btnLeaveOnPlayer, triLeaveDetect);
+  bindQuik(btnLeaveOnPlayer, triLeaveDetect, ".rutik leave");
+}
+
+
+var _origLoadStates=loadStates;
+loadStates = async function(){
+  try{
+    var states=await getJson("/states");
+    if(!states || typeof states!=="object") return;
+
+    var keys=Object.keys(states).sort();
+    var sigParts=[];
+    for(var i=0;i<keys.length;i++){
+      var k=keys[i];
+      var v=states[k]||{};
+      sigParts.push(
+        k+":"+
+        (v.Alert?1:0)+
+        (v.Storing?1:0)+
+        (v.Selling?1:0)+
+        (v.Enabled?1:0)+
+        (v.detectPlayer?1:0)+
+        (v.leaveOnDetect?1:0)+
+        (v.leaveOnKick?1:0)
+      );
+    }
+    var sig=sigParts.join("|");
+
+    if(sig!==lastStatesSig){
+      renderStatusList(states);
+
+      var triDetect=computeTriState(states,"detectPlayer");
+      var triLeaveDetect=computeTriState(states,"leaveOnDetect");
+      var triLeaveKick=computeTriState(states,"leaveOnKick");
+
+      applyQuikVisual(btnAlarmOnPlayer, triDetect);
+      applyQuikVisual(btnLeaveOnPlayer, triLeaveDetect);
+      applyQuikVisual(btnLeaveOnKick, triLeaveKick);
+
+      bindQuik(btnAlarmOnPlayer, triDetect, ".rutik detectPlayer");
+      bindQuik(btnLeaveOnPlayer, triLeaveDetect, ".rutik leave");
+      bindQuik(btnLeaveOnKick, triLeaveKick, ".rutik leaveonkick");
+
+      lastStatesSig=sig;
+    }
+
+    netNote.textContent="";
+  }catch(err){
+    
+  }
+};
+
+function loadAll(){
+  setTarget(selectedTarget);
+  loadBots();
+  loadStates();
+}
+
+setInterval(loadBots,5000);
+setInterval(loadStates,1000);
+loadAll();
+</script>
+</body>
+</html>
